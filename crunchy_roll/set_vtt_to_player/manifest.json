@@ -1,0 +1,36 @@
+{
+  "manifest_version": 3,
+  "version": "1.0.0",
+  "name": "Set vtt to player",
+  "description": "Thuban",
+  "icons": {
+    "128": "assets/icon128.png"
+  },
+  "permissions": [
+    "storage"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://static.crunchyroll.com/vilos-v2/web/vilos/player.html"
+      ],
+      "js": [
+        "player.js"
+      ],"css": [
+        "player.css"
+      ],
+      "all_frames": true,
+      "run_at": "document_start"
+    },{
+      "matches": [
+        "https://beta.crunchyroll.com/watch/*",
+        "https://www.crunchyroll.com/watch/*"
+      ],
+      "js": [
+        "main.js"
+      ],
+	  "all_frames": true,
+      "run_at": "document_idle"
+    }
+  ]
+}
