@@ -50,14 +50,10 @@ var latest_vtt_url = '';
 
 setInterval(function() {
 
-	chrome.storage.local.get(
-		['vtt_url'],
-		function(result) {
-			vtt_url = result.vtt_url;
-		}
-	);
-
-
+    chrome.storage.sync.get(['vtt_url'], function(items) {
+		vtt_url = items['vtt_url']
+    });
+	
 }, 1000);
 
 ////////vtt_url 에서 실제 자막 가져오기
@@ -354,7 +350,7 @@ function create_subtitle(){
 
 		// 번역된 자막에 마우스 누르고 위아래 움직 일 수 잇게 하기
 		my_subtitles = document.querySelector('#subtitles');
-		//my_subtitles.style.display = 'none';
+		my_subtitles.style.display = 'none';
 		
 		target_el = document.querySelector('#sub_right_2');
 		

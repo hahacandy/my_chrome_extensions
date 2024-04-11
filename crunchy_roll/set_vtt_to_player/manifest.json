@@ -6,9 +6,7 @@
   "icons": {
     "128": "assets/icon128.png"
   },
-  "permissions": [
-    "storage"
-  ],
+  "permissions": ["webRequest", "tabs", "storage", "scripting"],
   "content_scripts": [
     {
       "matches": [
@@ -32,5 +30,9 @@
 	  "all_frames": true,
       "run_at": "document_idle"
     }
-  ]
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "host_permissions": ["http://*/", "https://*/"]
 }
