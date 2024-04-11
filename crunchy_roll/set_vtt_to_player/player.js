@@ -170,12 +170,12 @@ function get_video_time(mode, vid_current_time, vid_paused){
 		
 		if(vtt_cues[i].text == current_sub_html){
 			current_cue_cursor = i;
+			break;
 		}
 		
 	}
 	
 	var current_cue_cursor2 = null;
-	
 	for(i=0; i<vtt_cues.length; i++){
 		if(vid_current_time < vtt_cues[i].start){
 			current_cue_cursor2 = i;
