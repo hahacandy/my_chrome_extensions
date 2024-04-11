@@ -56,8 +56,6 @@ def trans_text(driver, msg):
     try_idx = 0
     text_check = 0
     
-    time.sleep(0.5)
-    
     while True:
         try_idx = try_idx + 1
         try:
@@ -79,7 +77,7 @@ def trans_text(driver, msg):
         
         latest_text = current_text
         
-        if try_idx >= 30:
+        if try_idx >= 50:
             break
         
         time.sleep(0.1)
