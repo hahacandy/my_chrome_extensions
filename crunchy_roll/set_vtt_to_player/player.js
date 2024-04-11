@@ -43,8 +43,7 @@ function getElementByXpath(path) {
   return document.evaluate(path, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
 }
 
-///////////////////////////////
-
+///////////////////////////
 var vtt_url = '';
 var latest_vtt_url = '';
 
@@ -131,18 +130,11 @@ function convert_vtt_to_cue(all_vtt){
 
 
 //////////////////
-function set_vtt_cues(){
-	try{
-		get_subtitle();
-	}catch{}
-}
-
-///////////
 
 setInterval(function() {
-	if(vtt_url != latest_vtt_url){
+	if(vtt_url != '' && vtt_url != latest_vtt_url && document.querySelector("#vilosVttJs > div") != null){
 		latest_vtt_url = vtt_url;
-		set_vtt_cues();
+		get_subtitle();
 	}
 }, 1000);
 
@@ -250,10 +242,9 @@ function video_event_listener(e, vtt_cues){
 	
 	var move_time = null;
 	
-	
 	if (e.code == "KeyA") {
 		cue_will_stop = false;
-		if(vtt_cues.length == 0){
+		if(vtt_cues == null || vtt_cues.length == 0){
 			var preTime = vid.currentTime - 3;
 			if (preTime > 0) {
 				vid.currentTime = preTime;
@@ -263,7 +254,7 @@ function video_event_listener(e, vtt_cues){
 		}
 	}else if (e.code == "KeyD") {
 		cue_will_stop = false;
-		if(vtt_cues.length == 0){
+		if(vtt_cues == null || vtt_cues.length == 0){
 			var nextTime = vid.currentTime + 3;
 			if (nextTime+3 < vid.duration) {
 				vid.currentTime = nextTime;
@@ -290,18 +281,17 @@ function video_event_listener(e, vtt_cues){
 }
 
 
-document.addEventListener("keydown", (event) => video_event_listener(event, vtt_url));
+document.addEventListener("keydown", (event) => video_event_listener(event, vtt_cues));
 
-//////// 원래 자막 지우기
+//////// 원래 자막 숨기기
 
 function remove_ori_subtitle(){
-	
-	var ori_subtitle = getElementByXpath('//*[@id="vilosVttJs"]');
-	
+	var ori_subtitle = document.querySelector("#vilosVttJs");
 	if(ori_subtitle != null){
-		ori_subtitle.remove();
+		if(ori_subtitle.style.display == ''){
+			ori_subtitle.style.display = 'none';
+		}			
 	}
-
 }
 
 setInterval(remove_ori_subtitle, 1000);
@@ -499,6 +489,8 @@ function hide_sub_when_no_video(){
 	if(video != null){
 		if(video.className.includes('my_subtitles') == false){
 			
+			
+			
 			video.addEventListener("timeupdate", (event) => {
 				change_subtitle_cue();
 			});
@@ -513,7 +505,7 @@ function hide_sub_when_no_video(){
 			
 		}
 	}else{
-		//영상 보는 곳이 아닐경우 자막이 띄어져잇으면 숨김
+		//영상 보는 곳이 아닐경우 자막이 띄어져잇으면 숨김, 자막 vtt를 지움
 		if(subtitles_el != null){
 			document.querySelector('#subtitles').style.display = 'none';
 		}
