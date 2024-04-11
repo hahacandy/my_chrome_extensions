@@ -59,8 +59,10 @@ def trans_text(driver, msg):
     while True:
         try_idx = try_idx + 1
         try:
-            output_el = driver.find_element(By.XPATH, '//*[@id="tw-target-text"]')
+            output_el = driver.find_element(By.XPATH, '//*[@id="tw-target-text"]/span[1]')
             current_text = output_el.text
+            output_el2 = driver.find_element(By.XPATH, '//*[@id="CZf0ub"]')
+            current_progress = output_el2.get_attribute('class')
             
             if latest_text == current_text:
                 text_check = text_check + 1
@@ -70,7 +72,7 @@ def trans_text(driver, msg):
                 
             
             
-            if len(current_text) != 0 and '...' not in current_text and current_text != '번역' and text_check >= 5:
+            if len(current_text) != 0 and current_progress == 'RxYbNe iRZc1e' and current_text != '번역' and text_check >= 5:
                 break
         except:
             pass
