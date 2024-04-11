@@ -56,7 +56,7 @@ def trans_text(driver, msg):
     try_idx = 0
     text_check = 0
     
-    time.sleep(1)
+    time.sleep(0.5)
     
     while True:
         try_idx = try_idx + 1
@@ -79,7 +79,7 @@ def trans_text(driver, msg):
         
         latest_text = current_text
         
-        if try_idx >= 100:
+        if try_idx >= 30:
             break
         
         time.sleep(0.1)
@@ -121,8 +121,7 @@ async def accept_func(websocket, path):
                 #client_socket.sendall(trans_msg.encode(encoding="utf-8"))
                 
                 await websocket.send(send_info);# 클라인언트로 echo를 붙여서 재 전송한다.
-            else:
-                driver.get('https://www.google.com/search?q=%EA%B5%AC%EA%B8%80+%EB%B2%88%EC%97%AD') # vpn 같은거 떔에 결과가 안나올수도 잇어서 새로고침 
+                
         except:
             pass
             
