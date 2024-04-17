@@ -219,7 +219,7 @@ function video_event_listener(e, vtt_cues){
 		}
 	}else if (e.code == "KeyW") {
 		move_time = get_video_time('up', vid_current_time);
-		document.querySelector('#subtitle-1').innerHTML = '';
+		//document.querySelector('#subtitle-1').innerHTML = '';
 		cue_will_stop = true;
 	}else if (e.code == "KeyS") {
 		if(vid.paused){
