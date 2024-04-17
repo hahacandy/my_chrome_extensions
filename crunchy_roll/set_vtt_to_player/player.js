@@ -362,11 +362,11 @@ function change_subtitle_cue(){
 
 		if(vtt_cue.start <= video_current_time && video_current_time < vtt_cue.end){
 			current_cue_cursor = idx;
+			is_not_null = true;
 			if(document.querySelector('#subtitle-1').innerHTML != vtt_cue.text){
 				subtitle_1 = vtt_cue.text;
 				is_change = true;
 			}
-			is_not_null = true;
 			break;
 		}
 		
