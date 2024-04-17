@@ -189,7 +189,6 @@ var cue_will_stop = false;
 
 function video_event_listener(e, vtt_cues){
 	
-	cue_will_stop = false;
 	
 	var vid = document.getElementsByTagName('video')[0];
 	
@@ -205,6 +204,7 @@ function video_event_listener(e, vtt_cues){
 			}
 		}else{
 			move_time = get_video_time('left', vid_current_time);
+			cue_will_stop = false;
 		}
 	}else if (e.code == "KeyD") {
 		if(vtt_cues == null || vtt_cues.length == 0){
@@ -214,6 +214,7 @@ function video_event_listener(e, vtt_cues){
 			}
 		}else{
 			move_time = get_video_time('right', vid_current_time);
+			cue_will_stop = false;
 		}
 	}else if (e.code == "KeyW") {
 		move_time = get_video_time('up', vid_current_time);
