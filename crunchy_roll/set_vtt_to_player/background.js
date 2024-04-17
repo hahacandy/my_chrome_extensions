@@ -10,15 +10,11 @@ chrome.runtime.onInstalled.addListener(function() {
 				if (tabId < 0) return;
 				let requestVtt = details.url;
 				
-				
-				try{
-					chrome.storage.sync.set({'vtt_url': requestVtt}, function() {
-						console.log(requestVtt);
-						console.log('Settings saved');
-					});
-				}catch{}
+				chrome.storage.sync.set({'vtt_url': requestVtt}, function() {
+					console.log(requestVtt);
+					console.log('Settings saved');
+				});
 
-				
 			}
 		}
 

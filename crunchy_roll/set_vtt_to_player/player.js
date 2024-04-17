@@ -47,15 +47,6 @@ function getElementByXpath(path) {
 var vtt_url = '';
 var latest_vtt_url = '';
 
-setInterval(function() {
-	try{
-		chrome.storage.sync.get(['vtt_url'], function(items) {
-			vtt_url = items['vtt_url']
-		});
-	}catch{}
-	
-}, 1000);
-
 ////////vtt_url 에서 실제 자막 가져오기
 function get_subtitle(){
 
@@ -133,6 +124,11 @@ function convert_vtt_to_cue(all_vtt){
 //////////////////
 
 setInterval(function() {
+	
+	chrome.storage.sync.get(['vtt_url'], function(items) {
+		vtt_url = items['vtt_url']
+	});
+	
 	if(vtt_url != '' && vtt_url != latest_vtt_url && document.querySelector("#vilosVttJs > div") != null){
 		latest_vtt_url = vtt_url;
 		get_subtitle();
