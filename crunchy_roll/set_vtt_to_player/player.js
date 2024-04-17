@@ -143,11 +143,9 @@ setInterval(function() {
 
 //////////// 키보드 누르면 자막 이동 되게
 
-var latest_move_cursor = null;
-
 var current_cue_cursor = null;
 
-function get_video_time(mode, vid_current_time, vid_paused){
+function get_video_time(mode, vid_current_time){
 	
 	var subtitle_1_el = document.querySelector('#vilosVttJs > div > div > div > b');
 	var current_sub_html = null;
@@ -155,9 +153,6 @@ function get_video_time(mode, vid_current_time, vid_paused){
 	if(subtitle_1_el != null){
 		current_sub_html = subtitle_1_el.innerHTML;
 	}
-	
-	if(vid_paused==true)
-		vid_current_time = vid_current_time-0.3;
 	
 	var move_time = null;
 	
@@ -182,8 +177,6 @@ function get_video_time(mode, vid_current_time, vid_paused){
 		move_cursor = current_cue_cursor;
 	}
 	
-	latest_move_cursor = move_cursor;
-	
 	move_time = vtt_cues[move_cursor].start;
 
 	//console.log(move_time);
@@ -199,28 +192,25 @@ function video_event_listener(e, vtt_cues){
 	var move_time = null;
 	
 	if (e.code == "KeyA") {
-		cue_will_stop = false;
 		if(vtt_cues == null || vtt_cues.length == 0){
 			var preTime = vid.currentTime - 3;
 			if (preTime > 0) {
 				vid.currentTime = preTime;
 			}
 		}else{
-			move_time = get_video_time('left', vid_current_time, vid.paused);
+			move_time = get_video_time('left', vid_current_time);
 		}
 	}else if (e.code == "KeyD") {
-		cue_will_stop = false;
 		if(vtt_cues == null || vtt_cues.length == 0){
 			var nextTime = vid.currentTime + 3;
 			if (nextTime+3 < vid.duration) {
 				vid.currentTime = nextTime;
 			}
 		}else{
-			move_time = get_video_time('right', vid_current_time, vid.paused);
+			move_time = get_video_time('right', vid_current_time);
 		}
 	}else if (e.code == "KeyW") {
-		cue_will_stop = true;
-		move_time = get_video_time('up', vid_current_time, vid.paused);
+		move_time = get_video_time('up', vid_current_time);
 	}else if (e.code == "KeyS") {
 		if(vid.paused){
 			vid.play();
@@ -356,11 +346,10 @@ setInterval(create_subtitle, 1000);
 
 /////////// 생성된 자막 부분에 영어 자막 시간에 맞게 
 
-var cue_will_stop = false; // 한 문장이 끝나면 자동으로 멈추게 하기 위함
-
 function change_subtitle_cue(){
 	
 	var video = document.querySelector("video");
+	var video_current_time = video.currentTime;
 	var is_not_null = false;
 	
 	var subtitle_1 = null;
@@ -370,9 +359,7 @@ function change_subtitle_cue(){
 	for(var idx=0 ; idx < vtt_cues.length ; idx++){
 		
 		var vtt_cue = vtt_cues[idx];
-		
-		video_current_time = video.currentTime;
-		
+
 		if(vtt_cue.start <= video_current_time && video_current_time < vtt_cue.end){
 			current_cue_cursor = idx;
 			if(document.querySelector('#subtitle-1').innerHTML != vtt_cue.text){
@@ -385,7 +372,7 @@ function change_subtitle_cue(){
 		
 	}
 	
-
+	
 	if(is_not_null == false){
 		subtitle_1 = '';
 		is_change = true;
@@ -393,18 +380,9 @@ function change_subtitle_cue(){
 	
 	if(is_change == true){
 		
-		if(document.querySelector('#subtitle-1').innerHTML.length > 0){
-			
-			if(cue_will_stop == true){
-				video.pause();
-				cue_will_stop = false;
-			}
-		}
-		
 		if(video.paused == false){
 			document.querySelector('#subtitle-1').innerHTML = subtitle_1 ;
 			document.querySelector('#subtitle-2').innerHTML = subtitle_2 ;
-			
 			
 			// 자막 객체 숨기거나 보이게, 백그라운드 색상이 안남기 위해서 1
 			if(subtitle_1 == ''){
@@ -418,7 +396,6 @@ function change_subtitle_cue(){
 				document.querySelector('#subtitle-2').style.display = 'none';
 			}
 			
-			cue_will_stop = true;
 		}
 
 	}
