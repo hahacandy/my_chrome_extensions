@@ -145,6 +145,8 @@ setInterval(function() {
 
 var current_cue_cursor = null;
 
+
+
 function get_video_time(mode, vid_current_time){
 	
 	var subtitle_1_el = document.querySelector('#vilosVttJs > div > div > div > b');
@@ -183,7 +185,11 @@ function get_video_time(mode, vid_current_time){
 	return move_time;
 }
 
+var cue_will_stop = false;
+
 function video_event_listener(e, vtt_cues){
+	
+	cue_will_stop = false
 	
 	var vid = document.getElementsByTagName('video')[0];
 	
@@ -346,66 +352,85 @@ setInterval(create_subtitle, 1000);
 
 /////////// 생성된 자막 부분에 영어 자막 시간에 맞게 
 
+var is_while = false;
+
 function change_subtitle_cue(){
 	
-	var video = document.querySelector("video");
-	var video_current_time = video.currentTime;
-	var is_not_null = false;
-	
-	var subtitle_1 = null;
-	var subtitle_2 = '';
-	var is_change = false;
-	
-	for(var idx=0 ; idx < vtt_cues.length ; idx++){
+	if(is_while == false){
+		is_while = true;
 		
-		var vtt_cue = vtt_cues[idx];
+		var video = document.querySelector("video");
+		var video_current_time = video.currentTime;
+		var is_not_null = false;
+		
+		var subtitle_1 = null;
+		var subtitle_2 = '';
+		var is_change = false;
+		
+		var current_cue_cursor2 = null;
+		
+		for(var idx=0 ; idx < vtt_cues.length ; idx++){
+			
+			var vtt_cue = vtt_cues[idx];
 
-		if(vtt_cue.start <= video_current_time && video_current_time < vtt_cue.end){
-			current_cue_cursor = idx;
-			is_not_null = true;
-			if(document.querySelector('#subtitle-1').innerHTML != vtt_cue.text){
-				subtitle_1 = vtt_cue.text;
-				is_change = true;
-			}
-			break;
-		}
-		
-	}
-	
-	
-	if(is_not_null == false){
-		subtitle_1 = '';
-		is_change = true;
-	}
-	
-	if(is_change == true){
-		
-		if(video.paused == false){
-			document.querySelector('#subtitle-1').innerHTML = subtitle_1 ;
-			document.querySelector('#subtitle-2').innerHTML = subtitle_2 ;
-			
-			// 자막 객체 숨기거나 보이게, 백그라운드 색상이 안남기 위해서 1
-			if(subtitle_1 == ''){
-				document.querySelector('#subtitle-1').style.display = 'none';
-			}
-			else{
-				document.querySelector('#subtitle-1').style.display = '';
-			}
-			
-			if(subtitle_2 == ''){
-				document.querySelector('#subtitle-2').style.display = 'none';
+			if(vtt_cue.start <= video_current_time && video_current_time < vtt_cue.end){
+				current_cue_cursor2 = idx;
+				is_not_null = true;
+				if(document.querySelector('#subtitle-1').innerHTML != vtt_cue.text){
+					subtitle_1 = vtt_cue.text;
+					is_change = true;
+				}
+				break;
 			}
 			
 		}
+		
+		
+		if(is_not_null == false){
+			subtitle_1 = '';
+			is_change = true;
+		}
+		
+		if(is_change == true){
+			
+			if(cue_will_stop == true){
+				cue_will_stop = false;
+				if(video.paused == false && (document.querySelector('#subtitle-1').innerHTML == '' && is_not_null == false) == false && 
+					document.querySelector('#subtitle-1').innerHTML != ''){
+					video.pause();
+				}
+			}else{
+				if(video.paused == false){
+					document.querySelector('#subtitle-1').innerHTML = subtitle_1 ;
+					document.querySelector('#subtitle-2').innerHTML = subtitle_2 ;
+					
+					// 자막 객체 숨기거나 보이게, 백그라운드 색상이 안남기 위해서 1
+					if(subtitle_1 == ''){
+						document.querySelector('#subtitle-1').style.display = 'none';
+					}
+					else{
+						document.querySelector('#subtitle-1').style.display = '';
+					}
+					
+					if(subtitle_2 == ''){
+						document.querySelector('#subtitle-2').style.display = 'none';
+					}
+					
+					current_cue_cursor = current_cue_cursor2;
+					cue_will_stop = true;
+				}
+			}
 
+		}
+		// 자막 객체 숨기거나 보이게, 백그라운드 색상이 안남기 위해서 2
+		if(document.querySelector('#subtitle-1').innerHTML == '' && document.querySelector('#subtitle-2').innerHTML == ''){
+			document.querySelector('#subtitles').style.display = 'none';
+		}else{
+			document.querySelector('#subtitles').style.display = '';
+		}
+		
+		is_while = false;
 	}
-	// 자막 객체 숨기거나 보이게, 백그라운드 색상이 안남기 위해서 2
-	if(document.querySelector('#subtitle-1').innerHTML == '' && document.querySelector('#subtitle-2').innerHTML == ''){
-		document.querySelector('#subtitles').style.display = 'none';
-	}else{
-		document.querySelector('#subtitles').style.display = '';
-	}
-
 	
 }
 
