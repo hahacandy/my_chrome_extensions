@@ -378,9 +378,9 @@ function change_subtitle_cue(){
 			if(document.querySelector('#subtitle-1').innerHTML != vtt_cue.text){
 				
 				subtitle_1 = vtt_cue.text;
-				current_cue_cursor = idx;
 				is_change = true;
 			}
+			current_cue_cursor = idx;
 			is_not_null = true;
 			break;
 		}
