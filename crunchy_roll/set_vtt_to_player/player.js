@@ -189,7 +189,7 @@ var cue_will_stop = false;
 
 function video_event_listener(e, vtt_cues){
 	
-	cue_will_stop = false
+	cue_will_stop = false;
 	
 	var vid = document.getElementsByTagName('video')[0];
 	
@@ -216,6 +216,7 @@ function video_event_listener(e, vtt_cues){
 			move_time = get_video_time('right', vid_current_time);
 		}
 	}else if (e.code == "KeyW") {
+		cue_will_stop = true;
 		move_time = get_video_time('up', vid_current_time);
 	}else if (e.code == "KeyS") {
 		if(vid.paused){
