@@ -145,6 +145,8 @@ setInterval(function() {
 
 var latest_move_cursor = null;
 
+var current_cue_cursor = null;
+
 function get_video_time(mode, vid_current_time, vid_paused){
 	
 	var subtitle_1_el = document.querySelector('#vilosVttJs > div > div > div > b');
@@ -159,73 +161,30 @@ function get_video_time(mode, vid_current_time, vid_paused){
 	
 	var move_time = null;
 	
-	var current_cue_cursor = null;
-	
 	var move_cursor = null;
 	
-	for(i=0; i<vtt_cues.length; i++){
-		
-		if(vtt_cues[i].text == current_sub_html){
-			current_cue_cursor = i;
-			break;
-		}
-		
-	}
-	
-	var current_cue_cursor2 = null;
-	for(i=0; i<vtt_cues.length; i++){
-		if(vid_current_time < vtt_cues[i].start){
-			current_cue_cursor2 = i;
-			break;
+	if(current_cue_cursor == null){
+		for(i=0; i<vtt_cues.length; i++){
+			if(vid_current_time < vtt_cues[i].start){
+				current_cue_cursor = i;
+				break;
+			}
 		}
 	}
 	
 	if(mode == 'right'){
 		move_cursor = current_cue_cursor+1;
-		if(current_cue_cursor != null && latest_move_cursor != move_cursor && (latest_move_cursor+1) == move_cursor){
-			if(move_cursor < vtt_cues.length){
-				move_time = vtt_cues[move_cursor].start;
-			}
-		}else{
-			if(current_cue_cursor2 != null){
-				move_time = vtt_cues[current_cue_cursor2].start;
-			}
-		}
 	}
 	else if(mode == 'left'){
 		move_cursor = current_cue_cursor-1;
-		if(current_cue_cursor != null && latest_move_cursor != move_cursor && (latest_move_cursor-1) == move_cursor){
-			if(move_cursor >= 0){
-				move_time = vtt_cues[move_cursor].start;
-			}
-		}else{
-			if(current_cue_cursor2 != null){
-				move_time = vtt_cues[current_cue_cursor2].start;
-				var cue_cursor = current_cue_cursor2-2;
-				if(cue_cursor >= 0){
-					move_time = vtt_cues[cue_cursor].start;
-				}
-			}
-		}
 	}
 	else if(mode == 'up'){
-		
-		if(current_cue_cursor != null){
-			var move_cursor = current_cue_cursor;
-			move_time = vtt_cues[move_cursor].start;
-		}else{
-			if(current_cue_cursor2 != null){
-				move_time = vtt_cues[current_cue_cursor2].start;
-				
-				var cue_cursor = current_cue_cursor2-1;
-				if(cue_cursor >= 0){
-					move_time = vtt_cues[cue_cursor].start;
-				}
-			}
-		}
+		move_cursor = current_cue_cursor;
 	}
 	
 	latest_move_cursor = move_cursor;
+	
+	move_time = vtt_cues[move_cursor].start;
 
 	//console.log(move_time);
 	return move_time;
@@ -419,20 +378,19 @@ function change_subtitle_cue(){
 			if(document.querySelector('#subtitle-1').innerHTML != vtt_cue.text){
 				
 				subtitle_1 = vtt_cue.text;
+				current_cue_cursor = idx;
 				is_change = true;
 			}
 			is_not_null = true;
-			break
+			break;
 		}
 		
 	}
 	
 
 	if(is_not_null == false){
-		
 		subtitle_1 = '';
 		is_change = true;
-		
 	}
 	
 	if(is_change == true){
