@@ -145,7 +145,7 @@ setInterval(function() {
 
 var current_cue_cursor = null;
 
-
+var video_sync = 1;
 
 function get_video_time(mode, vid_current_time){
 	
@@ -162,7 +162,7 @@ function get_video_time(mode, vid_current_time){
 	
 	if(current_cue_cursor == null){
 		for(i=0; i<vtt_cues.length; i++){
-			if(vid_current_time < vtt_cues[i].start){
+			if(vid_current_time < vtt_cues[i].start + video_sync){
 				current_cue_cursor = i;
 				break;
 			}
@@ -179,13 +179,14 @@ function get_video_time(mode, vid_current_time){
 		move_cursor = current_cue_cursor;
 	}
 	
-	move_time = vtt_cues[move_cursor].start;
+	move_time = vtt_cues[move_cursor].start + video_sync;
 
 	//console.log(move_time);
 	return move_time;
 }
 
 var cue_will_stop = false;
+
 
 function video_event_listener(e, vtt_cues){
 	
@@ -198,7 +199,7 @@ function video_event_listener(e, vtt_cues){
 	
 	if (e.code == "KeyA") {
 		if(vtt_cues == null || vtt_cues.length == 0){
-			var preTime = vid.currentTime - 3;
+			var preTime = vid_current_time - 3;
 			if (preTime > 0) {
 				vid.currentTime = preTime;
 			}
@@ -208,7 +209,7 @@ function video_event_listener(e, vtt_cues){
 		}
 	}else if (e.code == "KeyD") {
 		if(vtt_cues == null || vtt_cues.length == 0){
-			var nextTime = vid.currentTime + 3;
+			var nextTime = vid_current_time + 3;
 			if (nextTime+3 < vid.duration) {
 				vid.currentTime = nextTime;
 			}
@@ -357,6 +358,8 @@ setInterval(create_subtitle, 1000);
 
 var is_while = false;
 
+
+
 function change_subtitle_cue(){
 	
 	if(is_while == false){
@@ -376,7 +379,7 @@ function change_subtitle_cue(){
 			
 			var vtt_cue = vtt_cues[idx];
 
-			if(vtt_cue.start <= video_current_time && video_current_time < vtt_cue.end){
+			if(vtt_cue.start + video_sync <= video_current_time && video_current_time < vtt_cue.end + video_sync){
 				current_cue_cursor2 = idx;
 				is_not_null = true;
 				if(document.querySelector('#subtitle-1').innerHTML != vtt_cue.text){
