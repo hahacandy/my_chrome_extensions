@@ -48,10 +48,11 @@ var vtt_url = '';
 var latest_vtt_url = '';
 
 setInterval(function() {
-
-    chrome.storage.sync.get(['vtt_url'], function(items) {
-		vtt_url = items['vtt_url']
-    });
+	try{
+		chrome.storage.sync.get(['vtt_url'], function(items) {
+			vtt_url = items['vtt_url']
+		});
+	}catch{}
 	
 }, 1000);
 
