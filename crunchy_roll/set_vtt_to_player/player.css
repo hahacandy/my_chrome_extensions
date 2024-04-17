@@ -18,6 +18,24 @@
 	width: 30px;
 }
 
+#sub_left_1, #sub_left_2{
+	height: 40%;
+}
+
+#sub_left_1{
+	background-color: rgba(0, 160, 0, 0.5);
+}
+
+#sub_left_2{
+	background-color: rgba(0, 192, 0, 0.5);
+}
+
+#sub_left_3 {
+	height: 20%;
+	font-size: calc(1vw);
+	text-align: center;
+}
+
 #sub_right_1, #sub_right_2{
 	height: 50%;
 }

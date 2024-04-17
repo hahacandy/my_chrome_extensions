@@ -145,7 +145,7 @@ setInterval(function() {
 
 var current_cue_cursor = null;
 
-var video_sync = 1;
+var video_sync = 0;
 
 function get_video_time(mode, vid_current_time){
 	
@@ -265,6 +265,24 @@ function create_subtitle(){
 		
 		var temp_ele_1 = document.createElement('div');
 		temp_ele_1.id = 'sub_left';
+		var temp_ele_1_1 = document.createElement('div');
+		temp_ele_1_1.id = 'sub_left_1';
+		temp_ele_1_1.addEventListener('mousedown', function(e){
+			video_sync = video_sync + 0.25;
+			temp_ele_1_3.textContent = video_sync;
+		});
+		var temp_ele_1_2 = document.createElement('div');
+		temp_ele_1_2.id = 'sub_left_2';
+		temp_ele_1_2.addEventListener('mousedown', function(e){
+			video_sync = video_sync + -0.25;
+			temp_ele_1_3.textContent = video_sync;
+		});
+		var temp_ele_1_3 = document.createElement('div');
+		temp_ele_1_3.id = 'sub_left_3';
+		temp_ele_1_3.textContent = '0';
+		temp_ele_1.appendChild(temp_ele_1_1);
+		temp_ele_1.appendChild(temp_ele_1_2);
+		temp_ele_1.appendChild(temp_ele_1_3);
 		
 		var temp_ele_2 = document.createElement('div');
 		temp_ele_2.id = 'sub_center';
@@ -277,6 +295,7 @@ function create_subtitle(){
 		temp_ele_3_2.id = 'sub_right_2';
 		temp_ele_3.appendChild(temp_ele_3_1);
 		temp_ele_3.appendChild(temp_ele_3_2);
+		
 		
 		temp_ele.appendChild(temp_ele_1);
 		temp_ele.appendChild(temp_ele_2);
