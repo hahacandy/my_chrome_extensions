@@ -1,3 +1,4 @@
+console.log('background test')
 chrome.runtime.onInstalled.addListener(function() {
   chrome.webRequest.onBeforeRequest.addListener(
     async function(details) {
@@ -10,7 +11,7 @@ chrome.runtime.onInstalled.addListener(function() {
 				if (tabId < 0) return;
 				let requestVtt = details.url;
 				
-				chrome.storage.sync.set({'vtt_url': requestVtt}, function() {
+				chrome.storage.local.set({'vtt_url': requestVtt}, function() {
 					console.log(requestVtt);
 					console.log('Settings saved');
 				});

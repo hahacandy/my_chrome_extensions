@@ -125,8 +125,9 @@ function convert_vtt_to_cue(all_vtt){
 
 setInterval(function() {
 	
-	chrome.storage.sync.get(['vtt_url'], function(items) {
+	chrome.storage.local.get(['vtt_url'], function(items) {
 		vtt_url = items['vtt_url']
+		chrome.storage.local.clear();
 	});
 	
 	if(vtt_url != '' && vtt_url != latest_vtt_url && document.querySelector("#vilosVttJs > div") != null){
