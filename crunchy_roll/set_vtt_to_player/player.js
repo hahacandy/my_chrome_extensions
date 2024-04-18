@@ -475,6 +475,14 @@ function hide_sub_when_no_video(){
 				change_subtitle_cue();
 			});
 			
+			video.addEventListener("pause", (event) => {
+				document.getElementById('sub_right_1').className = 'red_back';
+			});
+			
+			video.addEventListener("play", (event) => {
+				document.getElementById('sub_right_1').className = '';
+			});
+			
 			video.className = video.className + ' my_subtitles';
 			console.log('비디오 객체 timeupdate 리스너 달기 완료');
 			

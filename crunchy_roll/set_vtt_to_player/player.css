@@ -40,6 +40,10 @@
 	height: 50%;
 }
 
+.red_back{
+	background-color: rgba(204, 61, 61, 0.5);
+}
+
 #sub_right_2{
 	background-color: rgba(61, 183, 204, 0.75);
 }
