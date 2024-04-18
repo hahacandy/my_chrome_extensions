@@ -61,8 +61,12 @@ function get_subtitle(){
 		}
 	};
 	
-	x.open("GET", vtt_url);
-	x.send();
+	try{
+		x.open("GET", vtt_url);
+		x.send();
+	}catch{
+		chrome.storage.local.clear();
+	}
 
 }
 
@@ -127,7 +131,6 @@ setInterval(function() {
 	
 	chrome.storage.local.get(['vtt_url'], function(items) {
 		vtt_url = items['vtt_url']
-		chrome.storage.local.clear();
 	});
 	
 	if(vtt_url != '' && vtt_url != latest_vtt_url && document.querySelector("#vilosVttJs > div") != null){
