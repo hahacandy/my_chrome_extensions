@@ -74,14 +74,14 @@ def trans_text(driver, msg):
                     
                 
                 
-                if len(current_text) != 0 and current_progress == 'RxYbNe iRZc1e' and current_text != '번역' and text_check >= 5:
+                if len(current_text) != 0 and current_progress == 'RxYbNe iRZc1e' and current_text != '번역 중' and text_check >= 5:
                     break
             except:
                 pass
             
             latest_text = current_text
             
-            if try_idx >= 50:
+            if try_idx >= 30:
                 break
             
             time.sleep(0.1)
