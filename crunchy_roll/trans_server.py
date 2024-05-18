@@ -51,41 +51,43 @@ def trans_text(driver, msg):
     latest_text = ''
     current_text = ''
     
-    driver.execute_script(js_code, input_el, input_msg);
-    
-    try_idx = 0
-    text_check = 0
-    
-    while True:
-        try_idx = try_idx + 1
-        try:
-            output_el = driver.find_element(By.XPATH, '//*[@id="tw-target-text"]/span[1]')
-            current_text = output_el.text
-            output_el2 = driver.find_element(By.XPATH, '//*[@id="CZf0ub"]')
-            current_progress = output_el2.get_attribute('class')
-            
-            if latest_text == current_text:
-                text_check = text_check + 1
-            else:
-                #print(current_text)
-                text_check = 0
-                
-            
-            
-            if len(current_text) != 0 and current_progress == 'RxYbNe iRZc1e' and current_text != '번역' and text_check >= 5:
-                break
-        except:
-            pass
-        
-        latest_text = current_text
-        
-        if try_idx >= 50:
-            break
-        
-        time.sleep(0.1)
+    while current_text == '':
 
-    input_el.send_keys(Keys.CONTROL, 'a')
-    input_el.send_keys(Keys.BACKSPACE)
+        driver.execute_script(js_code, input_el, input_msg);
+
+        try_idx = 0
+        text_check = 0
+
+        while True:
+            try_idx = try_idx + 1
+            try:
+                output_el = driver.find_element(By.XPATH, '//*[@id="tw-target-text"]/span[1]')
+                current_text = output_el.text
+                output_el2 = driver.find_element(By.XPATH, '//*[@id="CZf0ub"]')
+                current_progress = output_el2.get_attribute('class')
+                
+                if latest_text == current_text:
+                    text_check = text_check + 1
+                else:
+                    #print(current_text)
+                    text_check = 0
+                    
+                
+                
+                if len(current_text) != 0 and current_progress == 'RxYbNe iRZc1e' and current_text != '번역' and text_check >= 5:
+                    break
+            except:
+                pass
+            
+            latest_text = current_text
+            
+            if try_idx >= 50:
+                break
+            
+            time.sleep(0.1)
+
+        input_el.send_keys(Keys.CONTROL, 'a')
+        input_el.send_keys(Keys.BACKSPACE)
 
     js_code2 = 'window.scrollTo(0, 0);'
     driver.execute_script(js_code2);
