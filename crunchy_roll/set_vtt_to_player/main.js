@@ -2,7 +2,7 @@ var is_hide_header = false;
 var mouse_event_time = new Date();
 setInterval(function() {
 	try{
-		if(new Date().getTime() - mouse_event_time.getTime() >= 5000){ //5초이상 가만히있을시 헤더 사라짐
+		if(new Date().getTime() - mouse_event_time.getTime() >= 3000){ //3초이상 가만히있을시 헤더 사라짐
 			is_hide_header = true;
 			document.querySelector('#content > div > div > div.erc-large-header').style.display='none';
 		}
