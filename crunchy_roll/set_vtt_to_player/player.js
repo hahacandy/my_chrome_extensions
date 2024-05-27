@@ -74,14 +74,29 @@ function get_subtitle(){
 //////////////////가져온 vtt 가공하기
 var vtt_cues = [];
 function convert_vtt_to_cue(all_vtt){
+	
 	vtt_cues = [];
+	var is_differt_vtt = null;
 	var temp_split_vtt = all_vtt.split('\r\n\r\n');
+	if(temp_split_vtt.length == 2){
+		is_differt_vtt = '1';
+		temp_split_vtt = all_vtt.split('\n\n');
+	}
 	
 	for(var i=0; i<temp_split_vtt.length; i++){
+		
+		if(i==0){
+			temp_split_vtt[i] = temp_split_vtt[i].replace('WEBVTT\r\n\r\n', '');
+		}
+		
 		if(temp_split_vtt[i].includes(' --> ') == true){
 			
-			var split_vt = temp_split_vtt[i].split('\r\n');
-			
+			var split_vt = null;
+			if(is_differt_vtt == null)
+				split_vt = temp_split_vtt[i].split('\r\n');
+			else if(is_differt_vtt == '1')
+				split_vt = temp_split_vtt[i].split('\n');
+
 			var vtt_cue = new Object();
 			var text_cue = '';
 			
