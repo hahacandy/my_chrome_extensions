@@ -5,6 +5,7 @@ setInterval(function() {
 		if(new Date().getTime() - mouse_event_time.getTime() >= 3000){ //3초이상 가만히있을시 헤더 사라짐
 			is_hide_header = true;
 			document.querySelector('#content > div > div > div.erc-large-header').style.display='none';
+			document.body.style.overflowY='auto';
 		}
 		
 		if(is_hide_header == false)
