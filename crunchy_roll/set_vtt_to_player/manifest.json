@@ -33,5 +33,5 @@
   "background": {
     "service_worker": "background.js"
   },
-  "host_permissions": ["*://*.crunchyroll.*"]
+   "host_permissions": ["http://*/", "https://*/"]
 }
