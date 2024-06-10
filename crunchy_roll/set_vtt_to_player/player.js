@@ -201,6 +201,10 @@ function get_video_time(mode, vid_current_time){
 	}
 	
 	move_time = vtt_cues[move_cursor].start + video_sync;
+	
+	if(mode == 'up'){
+		move_time = move_time + 0.01;
+	}
 
 	//console.log(move_time);
 	return move_time;
