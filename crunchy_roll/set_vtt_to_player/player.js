@@ -331,6 +331,16 @@ function create_subtitle(){
 		var temp_ele3 = document.createElement('div');
 		temp_ele3.id = 'subtitle-2';
 		
+		
+		temp_ele3.style.filter='blur(10px)';
+		temp_ele3.onmouseout = function (event) {
+			temp_ele3.style.filter='blur(10px)';
+		}
+		temp_ele3.onmouseover = function (event) {
+			temp_ele3.style.filter='blur(0px)';
+		}
+		
+		
 		temp_ele_2.appendChild(temp_ele2);
 		temp_ele_2.appendChild(temp_ele3);
 		
