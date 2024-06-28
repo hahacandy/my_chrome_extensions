@@ -278,6 +278,7 @@ function remove_ori_subtitle(){
 setInterval(remove_ori_subtitle, 1000);
 
 //////////////////////////////////// 커스텀 자막을 생성
+var is_click_sub2 = false;
 
 function create_subtitle(){
 	
@@ -333,12 +334,17 @@ function create_subtitle(){
 		
 		
 		temp_ele3.style.filter='blur(10px)';
-		temp_ele3.onmouseout = function (event) {
-			temp_ele3.style.filter='blur(10px)';
+		temp_ele3.onclick = function (event) {
+			
+			if(is_click_sub2 == true){
+				temp_ele3.style.filter='blur(10px)';
+				is_click_sub2 = false;
+			}else{
+				temp_ele3.style.filter='blur(0px)';
+				is_click_sub2 = true;
+			}
 		}
-		temp_ele3.onmouseover = function (event) {
-			temp_ele3.style.filter='blur(0px)';
-		}
+		
 		
 		
 		temp_ele_2.appendChild(temp_ele2);
@@ -463,6 +469,7 @@ function change_subtitle_cue(){
 				if(video.paused == false){
 					document.querySelector('#subtitle-1').innerHTML = subtitle_1 ;
 					document.querySelector('#subtitle-2').innerHTML = subtitle_2 ;
+					document.querySelector('#subtitle-2').style.filter='blur(10px)';
 					
 					// 자막 객체 숨기거나 보이게, 백그라운드 색상이 안남기 위해서 1
 					if(subtitle_1 == ''){
