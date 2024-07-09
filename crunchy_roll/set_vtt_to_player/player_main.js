@@ -28,15 +28,17 @@ function set_init() {
 	if(el_player != null){
 
 		window.addEventListener('mousemove', (event) => {
-			if(event.clientY > 100){
-				document.querySelector('#content > div > div > div.erc-large-header').style.display='none';
-				is_hide_header = true;
-			}else{
-				document.querySelector('#content > div > div > div.erc-large-header').style.display=''
-				is_hide_header = false;
+			if(document.getElementsByClassName('video-player').length > 0){
+				if(event.clientY > 100){
+					document.querySelector('#content > div > div > div.erc-large-header').style.display='none';
+					is_hide_header = true;
+				}else{
+					document.querySelector('#content > div > div > div.erc-large-header').style.display=''
+					is_hide_header = false;
+				}
+				
+				mouse_event_time = new Date(); 
 			}
-			
-			mouse_event_time = new Date(); 
 		});
 
 	}else{

@@ -332,7 +332,7 @@ function create_subtitle(){
 		var temp_ele3 = document.createElement('div');
 		temp_ele3.id = 'subtitle-2';
 		
-		
+		/*
 		temp_ele3.style.filter='blur(10px)';
 		temp_ele3.onclick = function (event) {
 			
@@ -344,7 +344,7 @@ function create_subtitle(){
 				is_click_sub2 = true;
 			}
 		}
-		
+		*/
 		
 		
 		temp_ele_2.appendChild(temp_ele2);
@@ -469,7 +469,7 @@ function change_subtitle_cue(){
 				if(video.paused == false){
 					document.querySelector('#subtitle-1').innerHTML = subtitle_1 ;
 					document.querySelector('#subtitle-2').innerHTML = subtitle_2 ;
-					document.querySelector('#subtitle-2').style.filter='blur(10px)';
+					//document.querySelector('#subtitle-2').style.filter='blur(10px)';
 					
 					// 자막 객체 숨기거나 보이게, 백그라운드 색상이 안남기 위해서 1
 					if(subtitle_1 == ''){
