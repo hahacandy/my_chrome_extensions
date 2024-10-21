@@ -200,7 +200,9 @@ function get_video_time(mode, vid_current_time){
 		move_cursor = current_cue_cursor;
 	}
 	
-	move_time = vtt_cues[move_cursor].start + video_sync;
+	if (move_cursor >= 0 && move_cursor < vtt_cues.length) {
+		move_time = vtt_cues[move_cursor].start + video_sync;
+	}
 	
 	if(mode == 'up'){
 		move_time = move_time + 0.01;
@@ -262,7 +264,10 @@ function video_event_listener(e, vtt_cues){
 }
 
 
-document.addEventListener("keydown", (event) => video_event_listener(event, vtt_cues));
+document.addEventListener("keydown", (event) => {
+    event.preventDefault();
+    video_event_listener(event, vtt_cues);
+});
 
 //////// 원래 자막 숨기기
 
