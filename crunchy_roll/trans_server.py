@@ -8,8 +8,12 @@ import json
 from io import StringIO
 from selenium.webdriver.common.keys import Keys
 
-# 번역된 자막을 저장하는 캐시
+# 번역된 자막을 저장하는 캐시 (번역된 시간 포함)
 saved_translated_subtitles = {}
+
+# 캐시가 만료된 자막인지 확인하는 함수 (1일 기준)
+def is_cache_expired(cache_time, expiration_time=86400):
+    return (time.time() - cache_time) > expiration_time
 
 # Selenium WebDriver 설정 및 생성 함수
 def get_driver():
@@ -107,14 +111,20 @@ async def accept_func(websocket, path):
             json_data = json.load(io)
             msg = json_data['msg']
 
-            # 번역된 메시지가 캐시에 있는지 확인
+            # 캐시된 번역 메시지가 있는지 확인하고, 1일이 지나면 삭제
             if msg in saved_translated_subtitles:
-                trans_msg = saved_translated_subtitles[msg]
+                trans_msg, cache_time = saved_translated_subtitles[msg]
+                if is_cache_expired(cache_time):  # 캐시가 만료되었는지 확인
+                    print(f"Cache expired for message: {msg}")
+                    del saved_translated_subtitles[msg]  # 캐시에서 제거
+                    trans_msg = trans_text(driver, msg)  # 새 번역 수행
+                    if trans_msg:
+                        saved_translated_subtitles[msg] = (trans_msg, time.time())  # 새로운 시간으로 캐시 갱신
             else:
                 # 캐시에 없으면 번역 수행
                 trans_msg = trans_text(driver, msg)
                 if trans_msg:
-                    saved_translated_subtitles[msg] = trans_msg
+                    saved_translated_subtitles[msg] = (trans_msg, time.time())  # 번역된 시각과 함께 캐시
 
             # 번역된 메시지 전송
             if trans_msg:
