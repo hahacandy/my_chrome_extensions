@@ -172,56 +172,46 @@ setInterval(function() {
 var current_cue_cursor = null;
 var video_sync = 0;
 
-function get_video_time(mode, vid_current_time){
-    var subtitle_1_el = document.querySelector('#vilosVttJs > div > div > div > b');
-    var current_sub_html = null;
-
-    if(subtitle_1_el != null){
-        current_sub_html = subtitle_1_el.innerHTML;
-    }
-
+function get_video_time(mode, vid_current_time) {
     var move_time = null;
     var move_cursor = null;
+    var time_offset = 0.1; // 0.1초 오차 허용 범위
 
-    if(current_cue_cursor == null){
-        for(i = 0; i < vtt_cues.length; i++){
-            if(vid_current_time < vtt_cues[i].start + video_sync){
+    if (current_cue_cursor == null) {
+        for (let i = 0; i < vtt_cues.length; i++) {
+            if (vid_current_time < vtt_cues[i].start + video_sync) {
                 current_cue_cursor = i;
                 break;
             }
         }
     }
 
-    if(mode == 'right'){
+    if (mode === 'right') {
         move_cursor = current_cue_cursor + 1;
         if (move_cursor >= vtt_cues.length) {
             move_cursor = vtt_cues.length - 1;
         }
-    }
-    else if(mode == 'left'){
+    } else if (mode === 'left') {
         move_cursor = current_cue_cursor - 1;
         if (move_cursor < 0) {
             move_cursor = 0;
         }
-    }
-    else if(mode == 'up'){
+    } else if (mode === 'up') {
         move_cursor = current_cue_cursor;
     }
 
+    // 자막이 존재하는 경우만 이동 시간을 설정
     if (move_cursor >= 0 && move_cursor < vtt_cues.length) {
         move_time = vtt_cues[move_cursor].start + video_sync;
 
-        // D키로 다음 자막으로 이동할 때 오차 보정을 위해 미세한 시간 추가
-        if (mode == 'right') {
-            if (move_time - vid_current_time < 0.5) { // 0.5초 이하로 차이가 나면 건너뛰는 현상 방지
-                move_time += 0.01;  // 0.01초 정도 앞으로 밀어서 건너뛰는 것을 방지
-            }
+        // 이전 자막으로 이동할 때 오차 보정
+        if (mode === 'left' && Math.abs(vid_current_time - move_time) < time_offset) {
+            move_time = vtt_cues[move_cursor].start + video_sync - time_offset; // 0.1초 이전으로 이동
         }
     }
 
     return move_time;
 }
-
 
 var cue_will_stop = false;
 
@@ -253,8 +243,10 @@ function video_event_listener(e, vtt_cues) {
 
     if (move_time !== null) {
         vid.currentTime = move_time;
-        if (vid.paused) {
-            vid.play();  // 비디오가 멈춰 있을 경우 재생
+
+        // 이전 자막으로 이동한 후 항상 재생 상태로 유지
+        if (vid.paused && !cue_will_stop) {
+            vid.play();
         }
     }
 }
@@ -263,6 +255,8 @@ document.addEventListener("keydown", (event) => {
     event.preventDefault();
     video_event_listener(event, vtt_cues);
 });
+
+
 
 
 
