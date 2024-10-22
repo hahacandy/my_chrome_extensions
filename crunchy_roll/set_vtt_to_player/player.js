@@ -171,11 +171,12 @@ setInterval(function() {
 
 var current_cue_cursor = null;
 var video_sync = 0;
+var min_repeat_time = 0.3;  // 반복 재생 최소 시간
 
 function get_video_time(mode, vid_current_time) {
     var move_time = null;
     var move_cursor = null;
-    var time_offset = 0.1; // 0.1초 오차 허용 범위
+    var time_offset = 0.1;  // 0.1초 오차 허용 범위
 
     if (current_cue_cursor == null) {
         for (let i = 0; i < vtt_cues.length; i++) {
@@ -208,6 +209,13 @@ function get_video_time(mode, vid_current_time) {
         if (mode === 'left' && Math.abs(vid_current_time - move_time) < time_offset) {
             move_time = vtt_cues[move_cursor].start + video_sync - time_offset; // 0.1초 이전으로 이동
         }
+
+        // 반복 재생할 때 최소 시간 확보
+        if (mode === 'up' && (vtt_cues[move_cursor].end - move_time) < min_repeat_time) {
+            move_time = Math.max(vtt_cues[move_cursor].start + video_sync - min_repeat_time, 0); // 최소 0.3초 앞에서 재생
+        }
+        
+        current_cue_cursor = move_cursor;  // 이동한 자막의 인덱스를 갱신
     }
 
     return move_time;
@@ -216,7 +224,7 @@ function get_video_time(mode, vid_current_time) {
 var cue_will_stop = false;
 
 function video_event_listener(e, vtt_cues) {
-    var vid = document.getElementsByTagName('video')[0];
+    var vid = document.querySelector('video');
     var vid_current_time = vid.currentTime;
     var move_time = null;
 
@@ -224,14 +232,18 @@ function video_event_listener(e, vtt_cues) {
         // 이전 자막으로 이동
         move_time = get_video_time('left', vid_current_time);
         cue_will_stop = false;
+        vid.play();  // 이동 후 자동 재생
     } else if (e.code === "KeyD") {
         // 다음 자막으로 이동
         move_time = get_video_time('right', vid_current_time);
         cue_will_stop = false;
+        vid.play();  // 이동 후 자동 재생
     } else if (e.code === "KeyW") {
         // 현재 자막 반복
-        move_time = get_video_time('up', vid_current_time);
-        cue_will_stop = true;
+        if (current_cue_cursor !== null && vtt_cues[current_cue_cursor]) {
+            move_time = vtt_cues[current_cue_cursor].start + video_sync;
+            cue_will_stop = true;  // 자막을 반복하기 위한 플래그 설정
+        }
     } else if (e.code === "KeyS") {
         // 재생/일시정지
         if (vid.paused) {
@@ -244,8 +256,11 @@ function video_event_listener(e, vtt_cues) {
     if (move_time !== null) {
         vid.currentTime = move_time;
 
-        // 이전 자막으로 이동한 후 항상 재생 상태로 유지
-        if (vid.paused && !cue_will_stop) {
+        // 반복 재생을 할 때는 정지하지 않도록 처리
+        if (!cue_will_stop) {
+            vid.play();
+        } else {
+            cue_will_stop = false;  // W키로 반복 재생 후 다시 재생 상태로 전환
             vid.play();
         }
     }
@@ -255,9 +270,6 @@ document.addEventListener("keydown", (event) => {
     event.preventDefault();
     video_event_listener(event, vtt_cues);
 });
-
-
-
 
 
 
