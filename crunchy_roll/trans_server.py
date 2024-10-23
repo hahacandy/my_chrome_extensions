@@ -11,8 +11,8 @@ from selenium.webdriver.common.keys import Keys
 # 번역된 자막을 저장하는 캐시 (번역된 시간 포함)
 saved_translated_subtitles = {}
 
-# 캐시가 만료된 자막인지 확인하는 함수 (1일 기준)
-def is_cache_expired(cache_time, expiration_time=86400):
+# 캐시가 만료된 자막인지 확인하는 함수 (10일 기준으로 변경)
+def is_cache_expired(cache_time, expiration_time=864000):  # 10일 = 864000초
     return (time.time() - cache_time) > expiration_time
 
 # Selenium WebDriver 설정 및 생성 함수
@@ -111,7 +111,7 @@ async def accept_func(websocket, path):
             json_data = json.load(io)
             msg = json_data['msg']
 
-            # 캐시된 번역 메시지가 있는지 확인하고, 1일이 지나면 삭제
+            # 캐시된 번역 메시지가 있는지 확인하고, 10일이 지나면 삭제
             if msg in saved_translated_subtitles:
                 trans_msg, cache_time = saved_translated_subtitles[msg]
                 if is_cache_expired(cache_time):  # 캐시가 만료되었는지 확인
@@ -132,9 +132,16 @@ async def accept_func(websocket, path):
                 send_info = json.dumps({'msg': msg, 'trans_msg': trans_msg})
                 await websocket.send(send_info)
 
+        except websockets.exceptions.ConnectionClosed as e:
+            if e.code == 1001:
+                print(f"Client closed the connection: {e.code}, {e.reason}")
+            else:
+                print(f"Connection closed with error: {e.code}, {e.reason}")
+            break
+
         except Exception as e:
             print(f"Error in WebSocket communication: {e}")
-            pass
+            break
 
 # 웹소켓 및 이벤트 루프 설정
 nest_asyncio.apply()
