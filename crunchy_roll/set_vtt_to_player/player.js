@@ -159,7 +159,7 @@ setInterval(function() {
 		latest_vtt_url = vtt_url;
 		get_subtitle();
 	}
-}, 1000);
+}, 100);
 
 setInterval(function() {
 	var black_screen_div = getElementByXpath('//*[@id="velocity-controls-package"]/div[1]');
