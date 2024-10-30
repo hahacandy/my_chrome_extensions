@@ -255,14 +255,8 @@ function video_event_listener(e, vtt_cues) {
 
     if (move_time !== null) {
         vid.currentTime = move_time;
+		vid.play();
 
-        // 반복 재생을 할 때는 정지하지 않도록 처리
-        if (!cue_will_stop) {
-            vid.play();
-        } else {
-            cue_will_stop = false;  // W키로 반복 재생 후 다시 재생 상태로 전환
-            vid.play();
-        }
     }
 }
 
