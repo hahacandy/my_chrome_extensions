@@ -268,7 +268,9 @@ function create_subtitle() {
     
     if (my_subtitles == null) {
         var temp_ele = document.createElement('div');
+		
         temp_ele.id = 'subtitles';
+		
         
         var temp_ele_1 = document.createElement('div');
         temp_ele_1.id = 'sub_left';
@@ -316,7 +318,8 @@ function create_subtitle() {
         temp_ele_2.appendChild(temp_ele3);
         
         // 부모 요소에 커스텀 자막 추가
-        getElementByXpath("/html/body/div[1]/div[1]/div/div[1]/main/div/div[1]/div/div/div/div/div/div/div/div/div/section/div/div[1]/div/div[2]/div[1]/div[1]").appendChild(temp_ele);
+        getElementByXpath("/html/body/div[1]/div[1]/div/div[1]/main/div/div[1]/div/div/div/div/div/div/div/div/div/section/div/div[1]/div/div[2]").appendChild(temp_ele);
+
         
         // 번역된 자막에 마우스 누르고 위아래 움직일 수 있게 하기
         my_subtitles = document.querySelector('#subtitles');
