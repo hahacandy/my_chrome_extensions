@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "version": "1.0.0",
+  "name": "Set vtt to player2",
+  "description": "Thuban",
+  "icons": {
+    "128": "assets/icon128.png"
+  },
+  "permissions": ["webRequest", "tabs", "storage", "scripting"],
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.udemy.com/course/*"
+      ],
+      "js": [
+        "player.js"
+      ],"css": [
+        "player.css"
+      ],
+      "all_frames": true,
+      "run_at": "document_idle"
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+   "host_permissions": ["http://*/", "https://*/"]
+}

@@ -85,64 +85,45 @@ function adjust_cue_times(vtt_cues) {
 }
 
 // vtt_cues를 불러온 후 시간 조정 적용
-function convert_vtt_to_cue(all_vtt) {
+function convert_vtt_to_cue(vtt_content) {
     vtt_cues = [];
-    var is_differt_vtt = null;
-    var temp_split_vtt = all_vtt.split('\r\n\r\n');
-    if (temp_split_vtt.length == 2) {
-        is_differt_vtt = '1';
-        temp_split_vtt = all_vtt.split('\n\n');
-    }
+    let sections = vtt_content.trim().split('\n\n'); // 블록별로 나누기
 
-    for (var i = 0; i < temp_split_vtt.length; i++) {
-        if (i == 0) {
-            temp_split_vtt[i] = temp_split_vtt[i].replace('WEBVTT\r\n\r\n', '');
-        }
+    for (let section of sections) {
+        if (section.startsWith("WEBVTT")) continue; // "WEBVTT" 헤더 무시
 
-        if (temp_split_vtt[i].includes(' --> ') == true) {
-            var split_vt = null;
-            if (is_differt_vtt == null) {
-                split_vt = temp_split_vtt[i].split('\r\n');
-            } else if (is_differt_vtt == '1') {
-                split_vt = temp_split_vtt[i].split('\n');
+        let lines = section.split('\n');
+        let timingLine = lines[0];
+        let textLines = lines.slice(1).join('\n'); // 나머지 줄을 텍스트로 합침
+
+        if (timingLine && timingLine.includes(" --> ")) {
+            let [start, end] = timingLine.split(" --> ");
+            
+            // 각 시간 형식을 초 단위로 변환
+            function timeToSeconds(time) {
+                let [minutes, seconds] = time.split(':');
+                minutes = parseInt(minutes) || 0;
+                seconds = parseFloat(seconds) || 0;
+                return (minutes * 60) + seconds;
             }
 
-            var vtt_cue = {};
-            var text_cue = '';
+            let startSeconds = timeToSeconds(start);
+            let endSeconds = timeToSeconds(end);
 
-            for (var j = 0; j < split_vt.length; j++) {
-                if (j == 0) {
-                    continue;
-                }
-
-                if (j == 1) {
-                    var split_v = split_vt[j].split(' ');
-                    vtt_cue.start = split_v[0];
-                    var start_split = vtt_cue.start.split(':');
-                    vtt_cue.start = parseFloat((start_split[0] * 60 * 60)) + parseFloat((start_split[1] * 60)) + parseFloat(start_split[2]);
-
-                    vtt_cue.end = split_v[2];
-                    var end_split = vtt_cue.end.split(':');
-                    vtt_cue.end = parseFloat((end_split[0] * 60 * 60)) + parseFloat((end_split[1] * 60)) + parseFloat(end_split[2]);
-                } else {
-                    text_cue += split_vt[j];
-                    if (j != split_vt.length - 1) {
-                        text_cue += '\n';
-                    }
-                }
+            if (!isNaN(startSeconds) && !isNaN(endSeconds)) {
+                vtt_cues.push({
+                    start: startSeconds,
+                    end: endSeconds,
+                    text: textLines.replace(/(<([^>]+)>)/ig, "").trim() // HTML 태그 제거 후 트림
+                });
             }
-
-            vtt_cue.text = text_cue.replaceAll(/(<([^>]+)>)/ig, "");
-            vtt_cues.push(vtt_cue);
         }
     }
 
+	console.log(vtt_cues);
     // 자막의 시간이 겹치는 경우 조정
     adjust_cue_times(vtt_cues);
 }
-
-
-
 
 
 //////////////////
@@ -150,22 +131,17 @@ function convert_vtt_to_cue(all_vtt) {
 setInterval(function() {
 	
 	try{
-		chrome.storage.local.get(['vtt_url'], function(items) {
-			vtt_url = items['vtt_url']
+		chrome.storage.local.get(['vtt_url2'], function(items) {
+			vtt_url = items['vtt_url2']
 		});
 	}catch{}
 	
-	if(vtt_url != '' && vtt_url != latest_vtt_url && document.querySelector("#vilosVttJs > div") != null){
+	if(vtt_url != '' && vtt_url != latest_vtt_url){
 		latest_vtt_url = vtt_url;
 		get_subtitle();
 	}
 }, 100);
 
-setInterval(function() {
-	var black_screen_div = getElementByXpath('//*[@id="velocity-controls-package"]/div[1]');
-	if(black_screen_div != null)
-		black_screen_div.style.backgroundColor = 'rgba(0, 0, 0, 0.0)';
-}, 100);
 
 //////////// 키보드 누르면 자막 이동 되게
 
@@ -223,21 +199,26 @@ function get_video_time(mode, vid_current_time) {
 
 var cue_will_stop = false;
 
+
 function video_event_listener(e, vtt_cues) {
     var vid = document.querySelector('video');
     var vid_current_time = vid.currentTime;
     var move_time = null;
-
+	
     if (e.code === "KeyA") {
         // 이전 자막으로 이동
         move_time = get_video_time('left', vid_current_time);
         cue_will_stop = false;
-        vid.play();  // 이동 후 자동 재생
+        if (vid.paused) {
+            getElementByXpath("/html/body/div[1]/div[1]/div/div[1]/main/div/div[1]/div/div/div/div/div/div/div/div/div/section/div/div[1]/div/div[2]/div[1]/div[1]").click()
+        }
     } else if (e.code === "KeyD") {
         // 다음 자막으로 이동
         move_time = get_video_time('right', vid_current_time);
         cue_will_stop = false;
-        vid.play();  // 이동 후 자동 재생
+        if (vid.paused) {
+            getElementByXpath("/html/body/div[1]/div[1]/div/div[1]/main/div/div[1]/div/div/div/div/div/div/div/div/div/section/div/div[1]/div/div[2]/div[1]/div[1]").click()
+        }
     } else if (e.code === "KeyW") {
         // 현재 자막 반복
         if (current_cue_cursor !== null && vtt_cues[current_cue_cursor]) {
@@ -246,16 +227,15 @@ function video_event_listener(e, vtt_cues) {
         }
     } else if (e.code === "KeyS") {
         // 재생/일시정지
-        if (vid.paused) {
-            vid.play();
-        } else {
-            vid.pause();
-        }
-    }
+		getElementByXpath("/html/body/div[1]/div[1]/div/div[1]/main/div/div[1]/div/div/div/div/div/div/div/div/div/section/div/div[1]/div/div[2]/div[1]/div[1]").click()
 
+    }
+	
     if (move_time !== null) {
         vid.currentTime = move_time;
-		vid.play();
+        if (vid.paused) {
+            getElementByXpath("/html/body/div[1]/div[1]/div/div[1]/main/div/div[1]/div/div/div/div/div/div/div/div/div/section/div/div[1]/div/div[2]/div[1]/div[1]").click()
+        }
 
     }
 }
@@ -270,7 +250,7 @@ document.addEventListener("keydown", (event) => {
 //////// 원래 자막 숨기기
 
 function remove_ori_subtitle(){
-	var ori_subtitle = document.querySelector("#vilosVttJs");
+	var ori_subtitle = getElementByXpath("/html/body/div[1]/div[1]/div/div[1]/main/div/div[1]/div/div/div/div/div/div/div/div/div/section/div/div[1]/div/div[2]/div[2]/div");
 	if(ori_subtitle != null){
 		if(ori_subtitle.style.display == ''){
 			ori_subtitle.style.display = 'none';
@@ -283,137 +263,123 @@ setInterval(remove_ori_subtitle, 1000);
 //////////////////////////////////// 커스텀 자막을 생성
 var is_click_sub2 = false;
 
-function create_subtitle(){
-	
-	var my_subtitles = document.querySelector('#subtitles');
-	
-	if(my_subtitles == null){
-		
-		var temp_ele = document.createElement('div');
-		temp_ele.id = 'subtitles';
-		
-		var temp_ele_1 = document.createElement('div');
-		temp_ele_1.id = 'sub_left';
-		var temp_ele_1_1 = document.createElement('div');
-		temp_ele_1_1.id = 'sub_left_1';
-		temp_ele_1_1.addEventListener('mousedown', function(e){
-			video_sync = video_sync + 0.25;
-			temp_ele_1_3.textContent = video_sync;
-		});
-		var temp_ele_1_2 = document.createElement('div');
-		temp_ele_1_2.id = 'sub_left_2';
-		temp_ele_1_2.addEventListener('mousedown', function(e){
-			video_sync = video_sync + -0.25;
-			temp_ele_1_3.textContent = video_sync;
-		});
-		var temp_ele_1_3 = document.createElement('div');
-		temp_ele_1_3.id = 'sub_left_3';
-		temp_ele_1_3.textContent = '0';
-		temp_ele_1.appendChild(temp_ele_1_1);
-		temp_ele_1.appendChild(temp_ele_1_2);
-		temp_ele_1.appendChild(temp_ele_1_3);
-		
-		var temp_ele_2 = document.createElement('div');
-		temp_ele_2.id = 'sub_center';
-		
-		var temp_ele_3 = document.createElement('div');
-		temp_ele_3.id = 'sub_right';
-		var temp_ele_3_1 = document.createElement('div');
-		temp_ele_3_1.id = 'sub_right_1';
-		var temp_ele_3_2 = document.createElement('div');
-		temp_ele_3_2.id = 'sub_right_2';
-		temp_ele_3.appendChild(temp_ele_3_1);
-		temp_ele_3.appendChild(temp_ele_3_2);
-		
-		
-		temp_ele.appendChild(temp_ele_1);
-		temp_ele.appendChild(temp_ele_2);
-		temp_ele.appendChild(temp_ele_3);
-		
-		var temp_ele2 = document.createElement('div');
-		temp_ele2.id = 'subtitle-1';
-		var temp_ele3 = document.createElement('div');
-		temp_ele3.id = 'subtitle-2';
-		
-		/*
-		temp_ele3.style.filter='blur(10px)';
-		temp_ele3.onclick = function (event) {
-			
-			if(is_click_sub2 == true){
-				temp_ele3.style.filter='blur(10px)';
-				is_click_sub2 = false;
-			}else{
-				temp_ele3.style.filter='blur(0px)';
-				is_click_sub2 = true;
-			}
-		}
-		*/
-		
-		
-		temp_ele_2.appendChild(temp_ele2);
-		temp_ele_2.appendChild(temp_ele3);
-		
+function create_subtitle() {
+    var my_subtitles = document.querySelector('#subtitles');
+    
+    if (my_subtitles == null) {
+        var temp_ele = document.createElement('div');
+        temp_ele.id = 'subtitles';
+        
+        var temp_ele_1 = document.createElement('div');
+        temp_ele_1.id = 'sub_left';
+        var temp_ele_1_1 = document.createElement('div');
+        temp_ele_1_1.id = 'sub_left_1';
+        temp_ele_1_1.addEventListener('mousedown', function(e) {
+            video_sync = video_sync + 0.25;
+            temp_ele_1_3.textContent = video_sync;
+        });
+        var temp_ele_1_2 = document.createElement('div');
+        temp_ele_1_2.id = 'sub_left_2';
+        temp_ele_1_2.addEventListener('mousedown', function(e) {
+            video_sync = video_sync + -0.25;
+            temp_ele_1_3.textContent = video_sync;
+        });
+        var temp_ele_1_3 = document.createElement('div');
+        temp_ele_1_3.id = 'sub_left_3';
+        temp_ele_1_3.textContent = '0';
+        temp_ele_1.appendChild(temp_ele_1_1);
+        temp_ele_1.appendChild(temp_ele_1_2);
+        temp_ele_1.appendChild(temp_ele_1_3);
+        
+        var temp_ele_2 = document.createElement('div');
+        temp_ele_2.id = 'sub_center';
+        
+        var temp_ele_3 = document.createElement('div');
+        temp_ele_3.id = 'sub_right';
+        var temp_ele_3_1 = document.createElement('div');
+        temp_ele_3_1.id = 'sub_right_1';
+        var temp_ele_3_2 = document.createElement('div');
+        temp_ele_3_2.id = 'sub_right_2';
+        temp_ele_3.appendChild(temp_ele_3_1);
+        temp_ele_3.appendChild(temp_ele_3_2);
+        
+        temp_ele.appendChild(temp_ele_1);
+        temp_ele.appendChild(temp_ele_2);
+        temp_ele.appendChild(temp_ele_3);
+        
+        var temp_ele2 = document.createElement('div');
+        temp_ele2.id = 'subtitle-1';
+        var temp_ele3 = document.createElement('div');
+        temp_ele3.id = 'subtitle-2';
+        
+        temp_ele_2.appendChild(temp_ele2);
+        temp_ele_2.appendChild(temp_ele3);
+        
+        // 부모 요소에 커스텀 자막 추가
+        getElementByXpath("/html/body/div[1]/div[1]/div/div[1]/main/div/div[1]/div/div/div/div/div/div/div/div/div/section/div/div[1]/div/div[2]/div[1]/div[1]").appendChild(temp_ele);
+        
+        // 번역된 자막에 마우스 누르고 위아래 움직일 수 있게 하기
+        my_subtitles = document.querySelector('#subtitles');
+        my_subtitles.style.display = 'none';
+        
+        target_el = document.querySelector('#sub_right_2');
+        my_subtitles.style.top = getCookie('subtitle_top'); // 이전 자막 위치 값 불러오기
+        
+        let lastY = 0;
+        let startY = 0; 
 
-		document.querySelector('body').appendChild(temp_ele);
-		
+        target_el.addEventListener('mousedown', function(e) {
+            startY = e.clientY;
+            target_el.classList.add('active');
+            
+            document.addEventListener('mouseup', onRemoveEvent);
+            document.addEventListener('mousemove', onMove);
+        });
+        
+        function onRemoveEvent() {
+            target_el.classList.remove('active');
+            document.removeEventListener('mouseup', onRemoveEvent);
+            document.removeEventListener('mousemove', onMove);
+        }
+        
+        function onMove(e) {
+            lastY = startY - e.clientY;
+            startY = e.clientY;
 
-		// 번역된 자막에 마우스 누르고 위아래 움직 일 수 잇게 하기
-		my_subtitles = document.querySelector('#subtitles');
-		my_subtitles.style.display = 'none';
-		
-		target_el = document.querySelector('#sub_right_2');
-		
+            // 이동할 때마다 boundingElement의 최신 위치를 가져옴
+            const boundingElement = getElementByXpath("/html/body/div[1]/div[1]/div/div[1]/main/div/div[1]/div/div/div/div/div/div/div/div/div/section/div/div[1]/div/div[2]/div[1]/div[2]/div[1]/div[1]");
+            const boundingRect = boundingElement ? boundingElement.getBoundingClientRect() : null;
 
-		my_subtitles.style.top = getCookie('subtitle_top'); // 이전 자막 위치 값 불러오기
-		
-		
-		
-		let lastX = 0;
-		let lastY = 0; 
-		let startX = 0; 
-		let startY = 0; 
-		
-		target_el.addEventListener('mousedown', function(e){
-		  //e.preventDefault(); 
-		  startX = e.clientX; 
-		  startY = e.clientY; 
-			
-		  target_el.classList.add('active');
-		  
-		  document.addEventListener('mouseup', onRemoveEvent); 
-		  
-		  document.addEventListener('mousemove', onMove); 
-		});
-		
-		function onRemoveEvent() { 
-		  target_el.classList.remove('active');
-		  document.removeEventListener('mouseup', onRemoveEvent); 
-		  document.removeEventListener('mousemove', onMove); 
-		} 
-		
-		function onMove(e) { 
-		  //e.preventDefault(); 
+            if (boundingRect) {
+                const maxTop = boundingRect.top;
+                const subtitle_top = my_subtitles.offsetTop - lastY;
+                
+                // 자막이 boundingElement의 bottom을 넘지 않도록 제한
+                if (subtitle_top >= 0 && subtitle_top + my_subtitles.offsetHeight <= maxTop) {
+                    my_subtitles.style.top = `${subtitle_top}px`;
+                    setCookie('subtitle_top', my_subtitles.style.top, 999);
+                } else if (subtitle_top + my_subtitles.offsetHeight > maxTop) {
+                    // 자막이 boundingElement 아래에 있을 때, maxTop 위로 강제 이동
+                    my_subtitles.style.top = `${maxTop - my_subtitles.offsetHeight - 10}px`;
+                }
+            }
+        }
 
-		  lastY = startY - e.clientY; 
-		
-		  startY = e.clientY; 
-		  
-		  var subtitle_top = (my_subtitles.offsetTop - lastY);
-		  
-		  if(subtitle_top >= 0 && subtitle_top < document.body.offsetHeight-120){
-			  	
-			  my_subtitles.style.top = (my_subtitles.offsetTop - lastY) + 'px';
-			  
-			  setCookie('subtitle_top', my_subtitles.style.top, 999);
-		  	
-		  }
-		  
-		}
-		
-		console.log('자막 부분 생성 완료');
-		
-	}
+        // 리사이즈 이벤트로 boundingElement의 변경 사항에 맞춰 자막 위치 조정
+        window.addEventListener('resize', () => {
+            const boundingElement = getElementByXpath("/html/body/div[1]/div[1]/div/div[1]/main/div/div[1]/div/div/div/div/div/div/div/div/div/section/div/div[1]/div/div[2]/div[1]/div[2]/div[1]/div[1]");
+            const boundingRect = boundingElement ? boundingElement.getBoundingClientRect() : null;
+            
+            if (boundingRect && my_subtitles.offsetTop + my_subtitles.offsetHeight > boundingRect.top) {
+                my_subtitles.style.top = `${boundingRect.top - my_subtitles.offsetHeight - 10}px`;
+            }
+        });
+        
+        console.log('자막 부분 생성 완료');
+    }
 }
+
+
 
 setInterval(create_subtitle, 1000);
 
@@ -466,7 +432,7 @@ function change_subtitle_cue(){
 				cue_will_stop = false;
 				if(video.paused == false && (document.querySelector('#subtitle-1').innerHTML == '' && is_not_null == false) == false && 
 					document.querySelector('#subtitle-1').innerHTML != ''){
-					video.pause();
+					getElementByXpath("/html/body/div[1]/div[1]/div/div[1]/main/div/div[1]/div/div/div/div/div/div/div/div/div/section/div/div[1]/div/div[2]/div[1]/div[1]").click()
 				}
 			}else{
 				if(video.paused == false){
@@ -535,7 +501,7 @@ function hide_sub_when_no_video(){
 			if(subtitles_el != null && subtitles_el.innerText.length > 0 && subtitles_el.style.display == 'none'){
 				document.querySelector('#subtitles').style.display = '';
 			}
-			
+
 		}
 	}else{
 		//영상 보는 곳이 아닐경우 자막이 띄어져잇으면 숨김, 자막 vtt를 지움
