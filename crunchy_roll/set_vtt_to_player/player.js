@@ -517,6 +517,7 @@ function hide_sub_when_no_video(){
 			
 			
 			video.addEventListener("timeupdate", (event) => {
+				is_while = false;
 				change_subtitle_cue();
 			});
 			
