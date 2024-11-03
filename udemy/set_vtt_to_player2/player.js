@@ -120,7 +120,7 @@ function convert_vtt_to_cue(vtt_content) {
         }
     }
 
-	console.log(vtt_cues);
+	//console.log(vtt_cues);
     // 자막의 시간이 겹치는 경우 조정
     adjust_cue_times(vtt_cues);
 }
@@ -387,8 +387,6 @@ setInterval(create_subtitle, 1000);
 
 var is_while = false;
 
-
-
 function change_subtitle_cue(){
 	
 	if(is_while == false){
@@ -480,9 +478,8 @@ function hide_sub_when_no_video(){
 	if(video != null){
 		if(video.className.includes('my_subtitles') == false){
 			
-			
-			
 			video.addEventListener("timeupdate", (event) => {
+				is_while = false;
 				change_subtitle_cue();
 			});
 			
