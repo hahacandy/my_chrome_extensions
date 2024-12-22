@@ -11,7 +11,7 @@ setInterval(() => {
     // 영상 객체가 있고, 재생 길이가 0보다 크다면
     if (video && video.duration > 0) {
       // 광고 구간 끝으로 강제 이동
-      video.currentTime = video.duration;
+      video.currentTime = video.duration-1;
       console.log('광고 구간을 건너뛰었습니다!');
     }
   }
