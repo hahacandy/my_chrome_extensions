@@ -36,10 +36,19 @@ const checkAndRemoveAds = () => {
     // 4. <ytd-rich-item-renderer class="style-scope ytd-rich-grid-renderer" ...> 요소 내 특정 광고 요소 삭제
     const richItemRenderers = document.querySelectorAll('ytd-rich-item-renderer.style-scope.ytd-rich-grid-renderer');
     richItemRenderers.forEach(richItem => {
+      // 기존: 광고 메타 블록 확인 및 삭제
       const adInlinePlaybackMeta = richItem.querySelector('ytd-ad-inline-playback-meta-block.style-scope.ytd-video-display-full-buttoned-and-button-group-renderer[ui-update]');
       if (adInlinePlaybackMeta) {
         richItem.remove();
         console.log('<ytd-rich-item-renderer> 요소를 삭제했습니다 (내부에 광고 메타 블록 포함).');
+        return; // 이미 삭제했으므로 다음 요소로 이동
+      }
+
+      // 새로 추가된 조건: <ytd-ad-slot-renderer> 요소가 포함되어 있는지 확인
+      const adSlotInRichItem = richItem.querySelector('ytd-ad-slot-renderer');
+      if (adSlotInRichItem) {
+        richItem.remove();
+        console.log('<ytd-rich-item-renderer> 요소를 삭제했습니다 (내부에 <ytd-ad-slot-renderer> 포함).');
       }
     });
   } catch (error) {
@@ -47,14 +56,38 @@ const checkAndRemoveAds = () => {
   }
 };
 
+const skipButtonClasses = [
+    "videoAdUiSkipButton",
+    "ytp-ad-skip-button ytp-button",
+    "ytp-ad-skip-button-modern ytp-button",
+    "ytp-skip-ad-button",
+];
+
+function getElementsByClassNames(classNames) {
+    return classNames
+        .map((name) => Array.from(document.getElementsByClassName(name)) || [])
+        .reduce((acc, elems) => acc.concat(elems), [])
+        .map((elem) => elem);
+}
+
+function clickSkipAdBtn() {
+    const elems = getElementsByClassNames(skipButtonClasses);
+    elems.forEach((el) => {
+        el.click();
+        console.log('Skip Ad 버튼을 클릭했습니다:', el);
+    });
+}
+
 // 초기 광고 제거 실행
 checkAndRemoveAds();
+clickSkipAdBtn();
 
 // MutationObserver 설정
 const observer = new MutationObserver((mutations) => {
   for (let mutation of mutations) {
     if (mutation.type === 'childList' || mutation.type === 'subtree') {
       checkAndRemoveAds();
+	  clickSkipAdBtn();
       break; // 한 번만 호출하여 효율성을 높임
     }
   }
