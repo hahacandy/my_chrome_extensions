@@ -28,9 +28,11 @@ const checkAndRemoveAds = () => {
       const video = document.querySelector('video');
     //  // 영상 객체가 있고, 재생 길이가 0보다 클 때만 실행
       if (video && video.duration > 0) {
-    //    // 광고 구간 끝으로 강제 이동
-        video.currentTime = video.duration/2;
-        console.log('광고 구간을 건너뛰었습니다!');
+		var skip_video_time = video.duration-3;
+		if(video.currentTime < skip_video_time){
+			video.currentTime = skip_video_time;
+			console.log('광고 구간을 건너뛰었습니다!');
+		}
       }
     }
 
