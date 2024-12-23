@@ -79,14 +79,14 @@ function clickSkipAdBtn() {
 }
 
 // 초기 광고 제거 실행
-checkAndRemoveAds();
+//checkAndRemoveAds(); 걸리는듯
 clickSkipAdBtn();
 
 // MutationObserver 설정
 const observer = new MutationObserver((mutations) => {
   for (let mutation of mutations) {
     if (mutation.type === 'childList' || mutation.type === 'subtree') {
-      checkAndRemoveAds();
+      //checkAndRemoveAds();
 	  clickSkipAdBtn();
       break; // 한 번만 호출하여 효율성을 높임
     }
