@@ -1,5 +1,20 @@
 // content.js
 
+function getElementsByClassNames(classNames) {
+    return classNames
+        .map((name) => Array.from(document.getElementsByClassName(name)) || [])
+        .reduce((acc, elems) => acc.concat(elems), [])
+        .map((elem) => elem);
+}
+
+function clickSkipAdBtn() {
+    const elems = getElementsByClassNames(skipButtonClasses);
+    elems.forEach((el) => {
+        el.click();
+        console.log('Skip Ad 버튼을 클릭했습니다:', el);
+    });
+}
+
 // 광고 요소를 감지하고 삭제하는 함수
 const checkAndRemoveAds = () => {
   try {
@@ -14,7 +29,7 @@ const checkAndRemoveAds = () => {
     //  // 영상 객체가 있고, 재생 길이가 0보다 클 때만 실행
     //  if (video && video.duration > 0) {
     //    // 광고 구간 끝으로 강제 이동
-    //    video.currentTime = video.duration-3;
+    //    video.currentTime = video.duration;
     //    console.log('광고 구간을 건너뛰었습니다!');
     //  }
     //}
@@ -63,20 +78,7 @@ const skipButtonClasses = [
     "ytp-skip-ad-button",
 ];
 
-function getElementsByClassNames(classNames) {
-    return classNames
-        .map((name) => Array.from(document.getElementsByClassName(name)) || [])
-        .reduce((acc, elems) => acc.concat(elems), [])
-        .map((elem) => elem);
-}
 
-function clickSkipAdBtn() {
-    const elems = getElementsByClassNames(skipButtonClasses);
-    elems.forEach((el) => {
-        el.click();
-        console.log('Skip Ad 버튼을 클릭했습니다:', el);
-    });
-}
 
 // 초기 광고 제거 실행
 checkAndRemoveAds();
