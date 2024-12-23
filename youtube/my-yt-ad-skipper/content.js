@@ -3,21 +3,26 @@
 // 광고 요소를 감지하고 삭제하는 함수
 const checkAndRemoveAds = () => {
   try {
-    // 1. 광고 배지(요소) 클래스
-    const adBadge = document.querySelector(
-      '.ad-simple-attributed-string.ytp-ad-badge__text--clean-player.ytp-ad-badge__text--clean-player-with-light-shadow'
-    );
+	  
+	  
+	  
+    // 1. 광고 배지(요소) 클래스 
+	// 이걸 하면 빠르게 스킵되지만 걸리는듯
+	
+    //const adBadge = document.querySelector(
+    //  '.ad-simple-attributed-string.ytp-ad-badge__text--clean-player.ytp-ad-badge__text--clean-player-with-light-shadow'
+    //);
 
     // 광고 배지가 있으면 광고로 간주
-    if (adBadge) {
-      const video = document.querySelector('video');
-      // 영상 객체가 있고, 재생 길이가 0보다 클 때만 실행
-      if (video && video.duration > 0) {
-        // 광고 구간 끝으로 강제 이동
-        video.currentTime = video.duration;
-        console.log('광고 구간을 건너뛰었습니다!');
-      }
-    }
+    //if (adBadge) {
+    //  const video = document.querySelector('video');
+    //  // 영상 객체가 있고, 재생 길이가 0보다 클 때만 실행
+    //  if (video && video.duration > 0) {
+    //    // 광고 구간 끝으로 강제 이동
+    //    video.currentTime = video.duration;
+    //    console.log('광고 구간을 건너뛰었습니다!');
+    //  }
+    //}
 
     // 2. <div id="player-ads" class="style-scope ytd-watch-flexy"> 요소 삭제
     const playerAds = document.querySelector('#player-ads.style-scope.ytd-watch-flexy');
@@ -79,14 +84,14 @@ function clickSkipAdBtn() {
 }
 
 // 초기 광고 제거 실행
-//checkAndRemoveAds(); 걸리는듯
+checkAndRemoveAds();
 clickSkipAdBtn();
 
 // MutationObserver 설정
 const observer = new MutationObserver((mutations) => {
   for (let mutation of mutations) {
     if (mutation.type === 'childList' || mutation.type === 'subtree') {
-      //checkAndRemoveAds();
+      checkAndRemoveAds();
 	  clickSkipAdBtn();
       break; // 한 번만 호출하여 효율성을 높임
     }
