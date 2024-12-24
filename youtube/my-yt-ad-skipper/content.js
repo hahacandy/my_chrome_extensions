@@ -26,13 +26,13 @@ const checkAndRemoveAds = () => {
     // 광고 배지가 있으면 광고로 간주
     if (adBadge) {
       const video = document.querySelector('video');
-    //  // 영상 객체가 있고, 재생 길이가 0보다 클 때만 실행
+      // 영상 객체가 있고, 재생 길이가 0보다 클 때만 실행
       if (video && video.duration > 0) {
-		var skip_video_time = video.duration-3;
-		if(video.currentTime < skip_video_time){
-			video.currentTime = skip_video_time;
-			console.log('광고 구간을 건너뛰었습니다!');
-		}
+        var skip_video_time = video.duration - 3;
+        if (video.currentTime < skip_video_time) {
+          video.currentTime = skip_video_time;
+          console.log('광고 구간을 건너뛰었습니다!');
+        }
       }
     }
 
@@ -68,6 +68,14 @@ const checkAndRemoveAds = () => {
         console.log('<ytd-rich-item-renderer> 요소를 삭제했습니다 (내부에 <ytd-ad-slot-renderer> 포함).');
       }
     });
+
+    // 5. <div id="masthead-ad" class="style-scope ytd-rich-grid-renderer"> 요소 삭제
+    const mastheadAd = document.querySelector('#masthead-ad.style-scope.ytd-rich-grid-renderer');
+    if (mastheadAd) {
+      mastheadAd.remove();
+      console.log('<div id="masthead-ad"> 요소를 삭제했습니다.');
+    }
+
   } catch (error) {
     console.error('광고 제거 중 오류 발생:', error);
   }
@@ -80,8 +88,6 @@ const skipButtonClasses = [
     "ytp-skip-ad-button",
 ];
 
-
-
 // 초기 광고 제거 실행
 checkAndRemoveAds();
 clickSkipAdBtn();
@@ -91,7 +97,7 @@ const observer = new MutationObserver((mutations) => {
   for (let mutation of mutations) {
     if (mutation.type === 'childList' || mutation.type === 'subtree') {
       checkAndRemoveAds();
-	  clickSkipAdBtn();
+      clickSkipAdBtn();
       break; // 한 번만 호출하여 효율성을 높임
     }
   }
