@@ -45,51 +45,49 @@ function clickSkipAdBtn() {
 // 광고 요소를 감지하고 삭제하는 함수
 function checkAndRemoveAds() {
     try {
-
-        // 2. <div id="player-ads" class="style-scope ytd-watch-flexy"> 요소 삭제
+        // 1. <div id="player-ads" class="style-scope ytd-watch-flexy"> 요소 삭제
         const playerAds = document.querySelector('#player-ads.style-scope.ytd-watch-flexy');
         if (playerAds) {
             playerAds.remove();
             console.log('<div id="player-ads"> 요소를 삭제했습니다.');
         }
 
-        // 3. <ytd-ad-slot-renderer class="style-scope ytd-item-section-renderer" layout=""> 요소 삭제
-        const adSlotRenderers = document.querySelectorAll('ytd-ad-slot-renderer.style-scope.ytd-item-section-renderer');
+        // 2. 모든 <ytd-ad-slot-renderer> 요소 삭제
+        const adSlotRenderers = document.querySelectorAll('ytd-ad-slot-renderer');
         adSlotRenderers.forEach(adSlot => {
             adSlot.remove();
             console.log('<ytd-ad-slot-renderer> 요소를 삭제했습니다.');
         });
 
-        // 4. <ytd-rich-item-renderer class="style-scope ytd-rich-grid-renderer" ...> 요소 내 특정 광고 요소 삭제
+        // 3. <ytd-rich-item-renderer> 요소 중 광고를 포함하는 요소 삭제
         const richItemRenderers = document.querySelectorAll('ytd-rich-item-renderer.style-scope.ytd-rich-grid-renderer');
         richItemRenderers.forEach(richItem => {
-            // 기존: 광고 메타 블록 확인 및 삭제
-            const adInlinePlaybackMeta = richItem.querySelector('ytd-ad-inline-playback-meta-block.style-scope.ytd-video-display-full-buttoned-and-button-group-renderer[ui-update]');
-            if (adInlinePlaybackMeta) {
+            // 내부에 <ytd-ad-slot-renderer> 또는 <ytd-ad-inline-playback-meta-block>이 있는지 확인
+            if (richItem.querySelector('ytd-ad-slot-renderer') || richItem.querySelector('ytd-ad-inline-playback-meta-block')) {
                 richItem.remove();
-                console.log('<ytd-rich-item-renderer> 요소를 삭제했습니다 (내부에 광고 메타 블록 포함).');
-                return; // 이미 삭제했으므로 다음 요소로 이동
-            }
-
-            // 새로 추가된 조건: <ytd-ad-slot-renderer> 요소가 포함되어 있는지 확인
-            const adSlotInRichItem = richItem.querySelector('ytd-ad-slot-renderer');
-            if (adSlotInRichItem) {
-                richItem.remove();
-                console.log('<ytd-rich-item-renderer> 요소를 삭제했습니다 (내부에 <ytd-ad-slot-renderer> 포함).');
+                console.log('<ytd-rich-item-renderer> 광고 요소를 삭제했습니다.');
             }
         });
 
-        // 5. <div id="masthead-ad" class="style-scope ytd-rich-grid-renderer"> 요소 삭제
+        // 4. <div id="masthead-ad" class="style-scope ytd-rich-grid-renderer"> 요소 삭제
         const mastheadAd = document.querySelector('#masthead-ad.style-scope.ytd-rich-grid-renderer');
         if (mastheadAd) {
             mastheadAd.remove();
             console.log('<div id="masthead-ad"> 요소를 삭제했습니다.');
         }
 
+        // 5. 특정 <div> 요소 삭제
+        const suggestedActionBadge = document.querySelector('.ytp-button.ytp-suggested-action-badge.ytp-featured-product.ytp-suggested-action-badge-expanded.ytp-suggested-action-badge-with-controls');
+        if (suggestedActionBadge) {
+            suggestedActionBadge.remove();
+            console.log('특정 <div> 요소(youtube suggested action badge)를 삭제했습니다.');
+        }
+
     } catch (error) {
         console.error('광고 제거 중 오류 발생:', error);
     }
 }
+
 
 const skipButtonClasses = [
     "videoAdUiSkipButton",
@@ -103,13 +101,12 @@ checkAndRemoveAds();
 skipAdSection();
 clickSkipAdBtn();
 
-
 // MutationObserver 설정
 const observer = new MutationObserver((mutations) => {
     for (let mutation of mutations) {
         if (mutation.type === 'childList' || mutation.type === 'subtree') {
             checkAndRemoveAds();
-			skipAdSection();
+            skipAdSection();
             clickSkipAdBtn();
             break; // 한 번만 호출하여 효율성을 높임
         }
